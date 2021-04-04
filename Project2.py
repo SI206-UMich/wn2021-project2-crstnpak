@@ -15,7 +15,20 @@ def get_titles_from_search_results(filename):
     [('Book title 1', 'Author 1'), ('Book title 2', 'Author 2')...]
     """
 
-    pass
+    book_list = []
+    authors_list = []
+    dir = os.path.dirname(__file__)
+    with open(os.path.join(dir, filename)) as c:
+        soup = BeautifulSoup(c, 'html.parser')
+        books = soup.find_all('a', class_ = 'bookTitle')
+        authors = soup.find_all('a', class_ = 'authorName')
+        for book in books:
+            book_list.append(book.text.strip())
+        for author in authors:
+            authors_list.append(author.text.strip())
+        titles = list(zip(book_list, authors_list))
+    return titles
+
 
 
 def get_search_links():
@@ -31,8 +44,20 @@ def get_search_links():
     “https://www.goodreads.com/book/show/kdkd".
 
     """
-
-    pass
+    url_list = []
+    base_url = 'https://www.goodreads.com'
+    url = 'https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc'
+    resp = requests.get(url)
+    if resp.ok:
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        table = soup.find('table', class_ = 'tableList')
+        books = table.find_all('a', class_ = 'bookTitle')
+        for book in books:
+            url = book.get('href', None)
+            url_list.append(base_url + url)
+    return url_list[:10]
+    
+    
 
 
 def get_book_summary(book_url):
@@ -49,8 +74,14 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
 
-    pass
-
+    resp = requests.get(book_url)
+    if resp.ok:
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        title = (soup.find(id = 'bookTitle').text).strip()
+        author = (soup.find('a', class_ = 'authorName').text).strip()
+        pages = (soup.find('span', itemprop = 'numberofPages').text).strip('pages')
+        book_info = (title, author, int(pages))
+    return book_info
 
 def summarize_best_books(filepath):
     """
@@ -63,7 +94,17 @@ def summarize_best_books(filepath):
     ("Fiction", "The Testaments (The Handmaid's Tale, #2)", "https://www.goodreads.com/choiceawards/best-fiction-books-2020") 
     to your list of tuples.
     """
-    pass
+    best_books = []
+    with open(os.path.join(filepath, 'best_books_2020.htm')) as c:
+        soup = BeautifulSoup(c, 'html.parser')
+        data = soup.find_all('div', class_ = 'category clearFix')
+        for c in data:
+            read = (c.h4.text).strip()
+            title = 
+
+            
+
+
 
 
 def write_csv(data, filename):
