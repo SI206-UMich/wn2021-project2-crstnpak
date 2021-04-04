@@ -99,8 +99,14 @@ def summarize_best_books(filepath):
         soup = BeautifulSoup(c, 'html.parser')
         data = soup.find_all('div', class_ = 'category clearFix')
         for c in data:
-            read = (c.h4.text).strip()
-            title = 
+            type = (c.h4.text).strip()
+            title = type.find("div", class_ = 'category__winnerImageContainer')
+            title = title.find('img', alt = True)
+            url = item.find('a').get('href')
+            tup = (type, title['alt'], url)
+            best_books.append(tup)
+    return best_books
+
 
             
 
@@ -127,7 +133,13 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    pass
+    dir = os.path.dirname(__file__)
+    outFile = open(os.path.join(dir, filename), 'w')
+    csv_writer = csv.writer(outFile)
+    csv_writer.writerow(['Book Title', 'Author Name'])
+    for c in data:
+        csv_writer.writerow([c[0], c[1]])
+    outFile.close()
 
 
 def extra_credit(filepath):
@@ -142,10 +154,11 @@ def extra_credit(filepath):
 class TestCases(unittest.TestCase):
 
     # call get_search_links() and save it to a static variable: search_urls
-
+    search_urls = get_search_links()
 
     def test_get_titles_from_search_results(self):
         # call get_titles_from_search_results() on search_results.htm and save to a local variable
+        get_titles = get_titles_from_search_results()
 
         # check that the number of titles extracted is correct (20 titles)
 
